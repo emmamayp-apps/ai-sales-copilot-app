@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { WandSparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +20,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -29,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { leadFormSchema, type LeadFormValues } from "@/lib/schema";
 
 type LeadFormProps = {
@@ -53,10 +55,14 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
   }
 
   return (
-    <Card className="border-slate-200 shadow-sm">
-      <CardHeader>
-        <CardTitle>Lead Details</CardTitle>
-        <CardDescription>
+    <Card className="border-white/60 bg-white/75 shadow-xl shadow-blue-100/40 backdrop-blur-sm">
+      <CardHeader className="pb-5">
+        <div className="mb-3 inline-flex w-fit items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700">
+          <WandSparkles className="h-3.5 w-3.5" />
+          Lead Input
+        </div>
+        <CardTitle className="text-2xl text-slate-900">Lead Details</CardTitle>
+        <CardDescription className="text-sm text-slate-600">
           Add company context and the value proposition you want the AI to use.
         </CardDescription>
       </CardHeader>
@@ -69,9 +75,13 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               name="company"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Company</FormLabel>
+                  <FormLabel className="text-slate-800">Company</FormLabel>
                   <FormControl>
-                    <Input placeholder="Acme Inc." {...field} />
+                    <Input
+                      placeholder="Acme Inc."
+                      className="h-11 border-slate-200 bg-white/80"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,9 +93,13 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel className="text-slate-800">Role</FormLabel>
                   <FormControl>
-                    <Input placeholder="Head of Sales" {...field} />
+                    <Input
+                      placeholder="Head of Sales"
+                      className="h-11 border-slate-200 bg-white/80"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,11 +111,17 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               name="contactName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contact name</FormLabel>
+                  <FormLabel className="text-slate-800">Contact name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Jane Smith" {...field} />
+                    <Input
+                      placeholder="Jane Smith"
+                      className="h-11 border-slate-200 bg-white/80"
+                      {...field}
+                    />
                   </FormControl>
-                  <FormDescription>Optional</FormDescription>
+                  <FormDescription className="text-slate-500">
+                    Optional
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -112,11 +132,12 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               name="context"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Context</FormLabel>
+                  <FormLabel className="text-slate-800">Context</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="What do you know about the company, lead, or current situation?"
                       rows={5}
+                      className="min-h-[130px] border-slate-200 bg-white/80"
                       {...field}
                     />
                   </FormControl>
@@ -130,11 +151,14 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               name="valueProp"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product / Value Prop</FormLabel>
+                  <FormLabel className="text-slate-800">
+                    Product / Value Prop
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="What are you selling and why might it matter to this lead?"
                       rows={4}
+                      className="min-h-[120px] border-slate-200 bg-white/80"
                       {...field}
                     />
                   </FormControl>
@@ -148,10 +172,13 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               name="tone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tone</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormLabel className="text-slate-800">Tone</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11 border-slate-200 bg-white/80">
                         <SelectValue placeholder="Select tone" />
                       </SelectTrigger>
                     </FormControl>
@@ -166,7 +193,10 @@ export function LeadForm({ onGenerate }: LeadFormProps) {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="h-11 w-full rounded-lg bg-slate-900 text-sm font-medium text-white shadow-lg shadow-slate-300 transition hover:bg-slate-800"
+            >
               Generate Email
             </Button>
           </form>
