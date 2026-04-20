@@ -9,19 +9,29 @@ import type { LeadFormValues } from "@/lib/schema";
 export default function Home() {
   const [result, setResult] = useState("");
 
-  const handleGenerate = (values: LeadFormValues) => {
-    setResult(
-      `Company: ${values.company}
-Role: ${values.role}
-Contact: ${values.contactName || "N/A"}
-Tone: ${values.tone}
+  const handleGenerate = async (values: LeadFormValues) => {
+    try {
+      setResult("Generating...");
 
-Context:
-${values.context}
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
-Value Prop:
-${values.valueProp}`
-    );
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to generate");
+      }
+
+      setResult(data.result);
+    } catch (err) {
+      console.error(err);
+      setResult("Error generating email. Please try again");
+    }
   };
 
   return (
