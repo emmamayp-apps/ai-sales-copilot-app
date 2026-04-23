@@ -13,13 +13,24 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
-type OutputPanelProps = {
-  result: string;
-  setResult: Dispatch<SetStateAction<string>>;
+type GeneratedResult = {
+  subjectLines: string[];
+  email: string;
+  followUps: string[];
 };
 
-export function OutputPanel({ result, setResult }: OutputPanelProps) {
-  const hasResult = result.trim().length > 0;
+type OutputPanelProps = {
+  result: GeneratedResult | null;
+  setResult: Dispatch<SetStateAction<GeneratedResult | null>>;
+  isGenerating: boolean;
+};
+
+export function OutputPanel({
+  result,
+  setResult,
+  isGenerating,
+}: OutputPanelProps) {
+  const hasResult = !!result;
 
   return (
     <Card className="border-white/60 bg-white/75 shadow-xl shadow-violet-100/40 backdrop-blur-sm">
@@ -37,7 +48,20 @@ export function OutputPanel({ result, setResult }: OutputPanelProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {!hasResult ? (
+        {isGenerating ? (
+          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-blue-50/70 p-8 text-center">
+            <div className="mb-4 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+              Generating
+            </div>
+            <h3 className="text-lg font-semibold text-slate-800">
+              Creating your draft
+            </h3>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+              The AI is generating subject lines, an email draft, and follow-up
+              ideas.
+            </p>
+          </div>
+        ) : !hasResult ? (
           <div className="flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-gradient-to-br from-slate-50 to-blue-50/70 p-8 text-center">
             <div className="mb-4 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
               Waiting for input
@@ -52,18 +76,62 @@ export function OutputPanel({ result, setResult }: OutputPanelProps) {
           </div>
         ) : (
           <>
-            <Textarea
-              value={result}
-              onChange={(e) => setResult(e.target.value)}
-              className="min-h-[420px] resize-none rounded-xl border-slate-200 bg-white/90"
-            />
+            <div className="space-y-6">
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-slate-700">
+                  Subject Lines
+                </h3>
+                <div className="space-y-2">
+                  {result.subjectLines.map((line, index) => (
+                    <div
+                      key={index}
+                      className="rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-sm text-slate-700"
+                    >
+                      {line}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-slate-700">
+                  Email Draft
+                </h3>
+                <Textarea
+                  value={result.email}
+                  onChange={(e) =>
+                    setResult({
+                      ...result,
+                      email: e.target.value,
+                    })
+                  }
+                  className="min-h-[220px] resize-none rounded-xl border-slate-200 bg-white/90"
+                />
+              </div>
+
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-slate-700">
+                  Follow-up Ideas
+                </h3>
+                <div className="space-y-2">
+                  {result.followUps.map((item, index) => (
+                    <div
+                      key={index}
+                      className="rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-sm text-slate-700"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <Button
                 type="button"
                 variant="secondary"
                 className="gap-2"
-                onClick={() => setResult("")}
+                onClick={() => setResult(null)}
               >
                 <Trash2 className="h-4 w-4" />
                 Clear
@@ -73,7 +141,20 @@ export function OutputPanel({ result, setResult }: OutputPanelProps) {
                 type="button"
                 variant="secondary"
                 className="gap-2"
-                onClick={() => navigator.clipboard.writeText(result)}
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    [
+                      "Subject Lines:",
+                      ...result.subjectLines.map((s) => `- ${s}`),
+                      "",
+                      "Email Draft:",
+                      result.email,
+                      "",
+                      "Follow-up Ideas:",
+                      ...result.followUps.map((f) => `- ${f}`),
+                    ].join("\n")
+                  )
+                }
               >
                 <Copy className="h-4 w-4" />
                 Copy

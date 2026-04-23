@@ -4,14 +4,23 @@ import { useState } from "react";
 import { Sparkles } from "lucide-react";
 import { LeadForm } from "@/components/lead-form";
 import { OutputPanel } from "@/components/output-panel";
-import type { LeadFormValues } from "@/lib/schema";
+import { LeadFormValues } from "@/lib/schema";
+
+
+type GeneratedResult = {
+  subjectLines: string[];
+  email: string;
+  followUps: string[];
+};
 
 export default function Home() {
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState<GeneratedResult | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerate = async (values: LeadFormValues) => {
     try {
-      setResult("Generating...");
+      setIsGenerating(true);
+      setResult(null);
 
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -27,10 +36,16 @@ export default function Home() {
         throw new Error(data.error || "Failed to generate");
       }
 
-      setResult(data.result);
-    } catch (err) {
-      console.error(err);
-      setResult("Error generating email. Please try again");
+      setResult(data);
+    } catch (error) {
+      console.error(error);
+      setResult({
+        subjectLines: ["Something went wrong"],
+        email: "There was an error generating the email. Please try again.",
+        followUps: ["Retry the request"],
+      });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -56,7 +71,11 @@ export default function Home() {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.05fr_0.95fr]">
           <LeadForm onGenerate={handleGenerate} />
-          <OutputPanel result={result} setResult={setResult} />
+          <OutputPanel
+            result={result}
+            setResult={setResult}
+            isGenerating={isGenerating}
+          />
         </div>
       </div>
     </main>
