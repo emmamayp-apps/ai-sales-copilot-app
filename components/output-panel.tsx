@@ -23,12 +23,20 @@ type OutputPanelProps = {
   result: GeneratedResult | null;
   setResult: Dispatch<SetStateAction<GeneratedResult | null>>;
   isGenerating: boolean;
+  activeAction: "generate" | "regenerate" | "shorter" | "more_professional" | null;
+  onRegenerate: () => void;
+  onMakeShorter: () => void;
+  onMoreProfessional: () => void;
 };
 
 export function OutputPanel({
   result,
   setResult,
   isGenerating,
+  activeAction,
+  onRegenerate,
+  onMakeShorter,
+  onMoreProfessional,
 }: OutputPanelProps) {
   const hasResult = !!result;
 
@@ -159,18 +167,36 @@ export function OutputPanel({
                 <Copy className="h-4 w-4" />
                 Copy
               </Button>
-
-              <Button type="button" variant="outline" className="gap-2" disabled>
+              
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                disabled={!!activeAction}
+                onClick={onRegenerate}
+              >
                 <RefreshCcw className="h-4 w-4" />
-                Regenerate
+                {activeAction === "regenerate" ? "Regenerating..." : "Regenerate"}
               </Button>
 
-              <Button type="button" variant="outline" disabled>
-                Make shorter
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!!activeAction}
+                onClick={onMakeShorter}
+              >
+                {activeAction === "shorter" ? "Shortening..." : "Make shorter"}
               </Button>
 
-              <Button type="button" variant="outline" disabled>
-                More professional
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!!activeAction}
+                onClick={onMoreProfessional}
+              >
+                {activeAction === "more_professional"
+                  ? "Refining..."
+                  : "More professional"}
               </Button>
             </div>
           </>

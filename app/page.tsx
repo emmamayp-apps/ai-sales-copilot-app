@@ -16,12 +16,17 @@ type GeneratedResult = {
 export default function Home() {
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [leadValues, setLeadValues] = useState<LeadFormValues | null>(null);
+  const [activeAction, setActiveAction] = useState<
+    "generate" | "regenerate" | "shorter" | "more_professional" | null
+  >(null);
 
   const handleGenerate = async (values: LeadFormValues) => {
     try {
-      setIsGenerating(true);
+      setActiveAction("generate");
+      setLeadValues(values);
       setResult(null);
-
+  
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: {
@@ -29,13 +34,13 @@ export default function Home() {
         },
         body: JSON.stringify(values),
       });
-
+  
       const data = await res.json();
-
+  
       if (!res.ok) {
         throw new Error(data.error || "Failed to generate");
       }
-
+  
       setResult(data);
     } catch (error) {
       console.error(error);
@@ -45,7 +50,41 @@ export default function Home() {
         followUps: ["Retry the request"],
       });
     } finally {
-      setIsGenerating(false);
+      setActiveAction(null);
+    }
+  };
+
+  const handleRefine = async (
+    action: "regenerate" | "shorter" | "more_professional"
+  ) => {
+    if (!result || !leadValues) return;
+  
+    try {
+      setActiveAction(action);
+  
+      const res = await fetch("/api/refine", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentEmail: result.email,
+          action,
+          lead: leadValues,
+        }),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to refine");
+      }
+  
+      setResult(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setActiveAction(null);
     }
   };
 
@@ -74,7 +113,11 @@ export default function Home() {
           <OutputPanel
             result={result}
             setResult={setResult}
-            isGenerating={isGenerating}
+            isGenerating={activeAction === "generate"}
+            activeAction={activeAction}
+            onRegenerate={() => handleRefine("regenerate")}
+            onMakeShorter={() => handleRefine("shorter")}
+            onMoreProfessional={() => handleRefine("more_professional")}
           />
         </div>
       </div>
